@@ -5,41 +5,54 @@ import { Radio, Icon, Card, Grid, Image, Dropdown, List, Segment, Divider } from
 class HostInfo extends Component{
   state = {
     checked: false,
-    value: "Area one",
-    areas: [
-      {key: 'area1', text: 'area1', value: 'Area one'},
-      {key: 'area2', text: 'area2', value: 'Area two'},
-      {key: 'area3', text: 'area3', value: 'Area three'}
-    ]
+    value: "cold_storage"
     // This state is here to show you how the Info box should work. But it doesn't have to (and probably shouldn't) live here
     // Plus the areas aren't called area1,2,or 3. That's just a placeholder.
   }
 
-  handleChange = (e) => {
-    // Your code here
+
+  handleChange = (e, data) => {
+    this.setState({
+      value: data.value
+    })
+
+    this.props.changeArea(data.value, this.props.selectedHost.imageUrl)
   }
 
+  static getDerivedStateFromProps(props, state){
+
+    return {
+      checked: props.selectedHost.status === "Active",
+      value: props.selectedHost.area,
+    }
+
+  }
 
   toggle = () => {
-    // Your code here
+    this.props.changeStatus(this.props.selectedHost.imageUrl)
   }
 
-  render(){
-    const { value, areas } = this.state
-    // A lot of these values are hardcoded.....but they shouldn't be, hint hint....
 
+
+  render(){
+    const { value } = this.state
+    // A lot of these values are hardcoded.....but they shouldn't be, hint hint....
+    const areas = this.props.areas.map(area => {
+      return {key: area.name, text: area.name, value: area.name}
+    })
+
+    areas.push({key: "cold_storage", text: "cold_storage", value: "cold_storage"})
     return (
       <Segment>
         <Grid>
           <Grid.Column width={6}>
-            <Image floated='left' size='small' src='https://a1cf74336522e87f135f-2f21ace9a6cf0052456644b80fa06d4f.ssl.cf2.rackcdn.com/images/characters/westworld-james.jpg'/>
+            <Image floated='left' size='small' src={this.props.selectedHost.imageUrl}/>
           </Grid.Column>
           <Grid.Column width={10}>
             <Card>
               <Card.Content>
                 <Card.Header>
-                  Teddy Flood <Icon name='man' />
-                  { /* What should happen when the host isn't a man? Or when his name isn't Teddy? */}
+                  {this.props.selectedHost.firstName + " " + this.props.selectedHost.lastName} <Icon name={this.props.selectedHost.gender === "Male" ? "man" : "woman"} />
                 </Card.Header>
                 <Card.Meta>
                   <Radio style={{margin: "10px"}} slider onChange={this.toggle} label={this.state.checked ? "Active" : "Decommissioned"} checked={this.state.checked}/>
